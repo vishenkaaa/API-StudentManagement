@@ -1,0 +1,555 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Student Management API",
+    "description": "API для управління навчальним процесом"
+  },
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Введіть токен у форматі: Bearer <Ваш_токен>"
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+
+  "host": "localhost:5000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "paths": {
+    "/students/register": {
+      "post": {
+        "tags": ["Students"],
+        "summary": "Реєстрація нового студента",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/StudentRegister" }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Студент успішно зареєстрований" },
+          "400": { "description": "Помилка реєстрації" }
+        }
+      }
+    },
+    "/students/login": {
+      "post": {
+        "tags": ["Students"],
+        "summary": "Вхід для студента",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/Login" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Успішний вхід" },
+          "404": { "description": "Студента не знайдено" }
+        }
+      }
+    },
+    "/students/update/{id}": {
+      "put": {
+        "tags": ["Students"],
+        "summary": "Оновлення даних студента",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/StudentUpdate" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Дані успішно оновлено" },
+          "404": { "description": "Студента не знайдено" }
+        }
+      }
+    },
+    "/students/class/{class}": {
+      "get": {
+        "tags": ["Students"],
+        "summary": "Пошук студентів за класом",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "class",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Список студентів" }
+        }
+      }
+    },
+    "/students/grades/export": {
+      "get": {
+        "tags": ["Students"],
+        "security": [{ "BearerAuth": [] }],
+        "summary": "Генерація звітів про оцінки студента",
+        "responses": {
+          "200": { "description": "Список оцінок студента" },
+          "404": { "description": "Студента не знайдено" }
+        }
+      }
+    },
+    "/teachers/add": {
+      "post": {
+        "tags": ["Teachers"],
+        "summary": "Додати вчителя до студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/Teacher" }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Вчителя додано" },
+          "400": { "description": "Помилка додавання вчителя" }
+        }
+      }
+    },
+    "/teachers/{id}": {
+      "delete": {
+        "tags": ["Teachers"],
+        "summary": "Видалити вчителя у студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Вчителя видалено" },
+          "403": { "description": "Немає доступу до цього вчителя" },
+          "404": { "description": "Вчителя не знайдено" }
+        }
+      },
+      "get": {
+        "tags": ["Teachers"],
+        "summary": "Отримати вчителя за ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Дані вчителя" }, 
+          "404": { "description": "Вчителя не знайдено" }
+        }
+      },
+      "put": {
+        "tags": ["Teachers"],
+        "summary": "Оновити вчителя",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/TeacherUpdate" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Вчителя оновлено" },
+          "403": { "description": "Немає доступу до цього вчителя" },
+          "404": { "description": "Вчителя не знайдено" }
+        }
+      }
+    },
+    "/teachers": {
+      "get": {
+        "tags": ["Teachers"],
+        "summary": "Отримати список вчителів студента",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Список вчителів" },
+          "404": { "description": "Студента не знайдено" }
+        }
+      }
+    },
+    "/subjects/add": {
+      "post": {
+        "tags": ["Subjects"],
+        "summary": "Додати предмет до студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/Subject" }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Предмет додано" },
+          "400": { "description": "Помилка додавання предмета" }
+        }
+      }
+    },
+    "/subjects/{id}": {
+      "delete": {
+        "tags": ["Subjects"],
+        "summary": "Видалити предмет у студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Предмет видалено" },
+          "403": { "description": "Немає доступу до цього предмета" },
+          "404": { "description": "Предмет не знайдено" }
+        }
+      },
+      "get": {
+        "tags": ["Subjects"],
+        "summary": "Отримати предмет за ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Дані предмета" },
+          "404": { "description": "Предмет не знайдено" }
+        }
+      },
+      "put": {
+        "tags": ["Subjects"],
+        "summary": "Оновити предмет",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/SubjectUpdate" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Предмет оновлено" },
+          "403": { "description": "Немає доступу до цього предмета" },
+          "404": { "description": "Предмет не знайдено" }
+        }
+      }
+    },
+    "/subjects": {
+      "get": {
+        "tags": ["Subjects"],
+        "summary": "Отримати список предметів студента",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Список предметів" },
+          "404": { "description": "Учня не знайдено" }
+        }
+      }
+    },
+    "/grades/add": {
+      "post": {
+        "tags": ["Grades"],
+        "summary": "Додати оцінку до студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/Grade" }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Оцінку додано" },
+          "400": { "description": "Помилка додавання оцінки" }
+        }
+      }
+    },
+    "/grades/{id}": {
+      "delete": {
+        "tags": ["Grades"],
+        "summary": "Видалити оцінку у студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Оцінку видалено" },
+          "403": { "description": "Немає доступу до цієї оцінки" },
+          "404": { "description": "Оцінку не знайдено" }
+        }
+      },
+      "get": {
+        "tags": ["Grades"],
+        "summary": "Отримати оцінку за ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Дані оцінки" },
+          "404": { "description": "Оцінку не знайдено" }
+        }
+      },
+      "put": {
+        "tags": ["Grades"],
+        "summary": "Оновити оцінку",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/GradeUpdate" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Оцінку оновлено" },
+          "403": { "description": "Немає доступу до цієї оцінки" },
+          "404": { "description": "Оцінку не знайдено" }
+        }
+      }
+    },
+    "/grades": {
+      "get": {
+        "tags": ["Grades"],
+        "summary": "Отримати список оцінок студента",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Список оцінок" },
+          "404": { "description": "Учня не знайдено" }
+        }
+      }
+    },
+    "/schedule": {
+      "get": {
+        "tags": ["Schedule"],
+        "summary": "Отримати розклад студента",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Розклад студента" },
+          "404": { "description": "Студента не знайдено" }
+        }
+      }
+    },
+    "/schedule/{id}": {
+      "get": {
+        "tags": ["Schedule"],
+        "summary": "Отримати заняття з розкладу за ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Дані заняття" },
+          "403": { "description": "Немає доступу до цього заняття" },
+          "404": { "description": "Заняття не знайдено" }
+        }
+      },
+      "put": {
+        "tags": ["Schedule"],
+        "summary": "Оновити заняття",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/ScheduleUpdate" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Заняття оновлено" },
+          "403": { "description": "Немає доступу до цього заняття" },
+          "404": { "description": "Заняття не знайдено" }
+        }
+      },
+      "delete": {
+        "tags": ["Schedule"],
+        "summary": "Видалити заняття з розкладу",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Заняття видалено" },
+          "403": { "description": "Немає доступу до цього заняття" },
+          "404": { "description": "Заняття не знайдено" }
+        }
+      }
+    },
+    "/schedule/add": {
+      "post": {
+        "tags": ["Schedule"],
+        "summary": "Додати заняття до розкладу студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/Schedule" }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Заняття додано" },
+          "400": { "description": "Помилка додавання заняття" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "StudentRegister": {
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "password": { "type": "string" }
+      }
+    },
+    "Login": {
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "password": { "type": "string" }
+      }
+    },
+    "StudentUpdate": {
+      "type": "object",
+      "properties": {
+        "surname": { "type": "string" },
+        "name": { "type": "string" },
+        "dateOfBirth": { "type": "string", "format": "date" },
+        "class": { "type": "string" }
+      }
+    },
+    "Teacher": {
+      "type": "object",
+      "properties": {
+        "surname": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
+    "TeacherUpdate": {
+      "type": "object",
+      "properties": {
+        "surname": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
+    "Subject": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "teacherId": { "type": "string" },
+        "hoursPerWeek": { "type": "number" }
+      }
+    },
+    "SubjectUpdate": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "teacherId": { "type": "string" },
+        "hoursPerWeek": { "type": "number" }
+      }
+    },
+    "Grade": {
+      "type": "object",
+      "properties": {
+        "subjectId": { "type": "string" },
+        "grade": { "type": "number" },
+        "date": { "type": "string", "format": "date" }
+      }
+    },
+    "GradeUpdate": {
+      "type": "object",
+      "properties": {
+        "subjectId": { "type": "string" },
+        "grade": { "type": "number" },
+        "date": { "type": "string", "format": "date" }
+      }
+    },
+    "Schedule": {
+      "type": "object",
+      "properties": {
+        "dayOfWeek": { "type": "string" },
+        "time": { "type": "string" },
+        "subjectId": { "type": "string" },
+        "teacherId": { "type": "string" }
+      }
+    },
+    "ScheduleUpdate": {
+      "type": "object",
+      "properties": {
+        "dayOfWeek": { "type": "string" },
+        "time": { "type": "string" },
+        "subjectId": { "type": "string" },
+        "teacherId": { "type": "string" }
+      }
+    }
+  }
+}
