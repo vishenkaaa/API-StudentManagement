@@ -66,6 +66,16 @@ router.put('/update/:id', async (req, res) => {
     }
 });
 
+// Пошук учнів за класом
+router.get('/class/:class', async (req, res) => {
+    try {
+        const students = await Student.find({ class: req.params.class });
+        res.json(students);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Експорт оцінок студента у Word
 router.get('/grades/export', authMiddleware, async (req, res) => {
     try {
