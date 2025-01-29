@@ -1,6 +1,7 @@
 const express = require('express');
 const Schedule = require('../models/Schedule');
 const Student = require('../models/Student');
+const Subject = require('../models/Subject');
 const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
@@ -8,13 +9,16 @@ const router = express.Router();
 // Додати заняття до розкладу студента
 router.post('/add', authMiddleware, async (req, res) => {
     try {
-        const { dayOfWeek, time, subject, teacher } = req.body;
+        const { dayOfWeek, time, subjectId } = req.body;
         const studentId = req.userId; 
 
         const student = await Student.findById(studentId);
         if (!student) return res.status(404).json({ error: 'Студента не знайдено' });
 
-        const newSchedule = new Schedule({ dayOfWeek, time, subject, teacher });
+        const subject = await Subject.findById(subjectId);
+        if (!subject) return res.status(404).json({ error: 'Предмет не знайдено' });
+
+        const newSchedule = new Schedule({ dayOfWeek, time, subject });
         await newSchedule.save();
 
         student.schedule.push(newSchedule._id);
@@ -30,7 +34,7 @@ router.post('/add', authMiddleware, async (req, res) => {
 router.put('/:id', authMiddleware, async (req, res) => {
     try {
         const scheduleId = req.params.id;
-        const { dayOfWeek, time, subject, teacher } = req.body;
+        const { dayOfWeek, time, subject } = req.body;
         const studentId = req.userId;
 
         const student = await Student.findById(studentId);
@@ -40,7 +44,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
         const updatedSchedule = await Schedule.findByIdAndUpdate(
             scheduleId,
-            { dayOfWeek, time, subject, teacher },
+            { dayOfWeek, time, subject },
             { new: true }
         );
 

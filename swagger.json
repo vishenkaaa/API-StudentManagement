@@ -550,8 +550,7 @@
       "properties": {
         "dayOfWeek": { "type": "string" },
         "time": { "type": "string" },
-        "subjectId": { "type": "string" },
-        "teacherId": { "type": "string" }
+        "subjectId": { "type": "string" }
       }
     },
     "ScheduleUpdate": {
@@ -559,8 +558,7 @@
       "properties": {
         "dayOfWeek": { "type": "string" },
         "time": { "type": "string" },
-        "subjectId": { "type": "string" },
-        "teacherId": { "type": "string" }
+        "subjectId": { "type": "string" }
       }
     }
   }
