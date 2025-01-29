@@ -66,67 +66,64 @@ router.put('/update/:id', async (req, res) => {
     }
 });
 
-// Генерація звітів про оцінки учнів та експорт у Word
+// Експорт оцінок студента у Word
 router.get('/grades/export', authMiddleware, async (req, res) => {
     try {
         const studentId = req.userId;
+        const student = await Student.findById(studentId).populate({
+            path: 'grades',
+            populate: { path: 'subject', select: 'name' }, 
+        });
 
-        const student = await Student.findById(studentId).populate('grades');
         if (!student) return res.status(404).json({ error: 'Студента не знайдено' });
 
-        // Створення документа Word
-        const doc = new Document();
-
-        // Додавання заголовку
-        doc.addSection({
-            children: [
-                new Paragraph({
+        const doc = new Document({
+            sections: [
+                {
+                    properties: {},
                     children: [
-                        new TextRun({
-                            text: `Звіт про оцінки студента ${student.surname} ${student.name}`,
-                            bold: true,
-                            size: 28,
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: `Звіт про оцінки студента: ${student.surname} ${student.name}`,
+                                    bold: true,
+                                    size: 28,
+                                }),
+                            ],
                         }),
+                        new Paragraph({
+                            text: `Клас: ${student.class || 'Не вказано'}\nДата: ${new Date().toLocaleDateString()}`,
+                            spacing: { after: 200 },
+                        }),
+                        new Paragraph({
+                            text: 'Оцінки:',
+                            bold: true,
+                            spacing: { after: 100 },
+                        }),
+                        ...student.grades.map((grade) =>
+                            new Paragraph({
+                                text: `Предмет: ${grade.subject?.name || 'Не вказано'}, Оцінка: ${grade.grade}, Дата: ${new Date(grade.date).toLocaleDateString()}`,
+                            })
+                        ),
                     ],
-                }),
-                new Paragraph({
-                    text: `Клас: ${student.class || 'Не вказано'}\nДата: ${new Date().toLocaleDateString()}`,
-                    spacing: { after: 200 },
-                }),
+                },
             ],
         });
 
-        // Додавання оцінок
-        if (student.grades.length > 0) {
-            doc.addSection({
-                children: student.grades.map((grade) =>
-                    new Paragraph({
-                        text: `Предмет: ${grade.subject || 'Не вказано'}, Оцінка: ${grade.grade}, Дата: ${grade.date.toISOString().split('T')[0]}`,
-                    })
-                ),
-            });
-        } else {
-            doc.addSection({
-                children: [
-                    new Paragraph({
-                        text: 'Оцінок немає.',
-                        italics: true,
-                    }),
-                ],
-            });
-        }
-
-        // Генерація файлу Word
         const buffer = await Packer.toBuffer(doc);
 
-        // Відправка файлу у відповідь
-        const fileName = `grades-report-${student._id}.docx`;
-        res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+        const fileName = `Звіт-${student.surname}.docx`;
+
+        const encodedFileName = encodeURIComponent(fileName);
+
+        res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFileName}`);
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
         res.send(buffer);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Помилка експорту у Word:', error);
+        res.status(500).json({ error: 'Помилка генерації файлу' });
     }
 });
+
 
 module.exports = router;

@@ -105,10 +105,22 @@
       "get": {
         "tags": ["Students"],
         "security": [{ "BearerAuth": [] }],
-        "summary": "Генерація звітів про оцінки студента",
+        "summary": "Генерація звіту про оцінки студента у форматі Word",
+        "produces": ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
         "responses": {
-          "200": { "description": "Список оцінок студента" },
-          "404": { "description": "Студента не знайдено" }
+          "200": {
+            "description": "Файл звіту у форматі Word",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": { "description": "Студента не знайдено" },
+          "500": { "description": "Помилка генерації файлу" }
         }
       }
     },

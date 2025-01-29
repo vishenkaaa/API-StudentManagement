@@ -9,23 +9,20 @@ const router = express.Router();
 router.post('/add', authMiddleware, async (req, res) => {
     try {
         const { subjectId, grade, date } = req.body;
-        const studentId = req.userId; // Беремо ID студента з токена
+        const studentId = req.userId;
 
-        // Перевіряємо, чи існує студент
         const student = await Student.findById(studentId);
         if (!student) return res.status(404).json({ error: 'Студента не знайдено' });
 
-        // Створюємо новий об'єкт оцінки
         const newGrade = new Grade({
-            student: studentId,  // Використовуємо `student`, а не `studentId`
-            subject: subjectId,  // Використовуємо `subject`, а не `subjectId`
+            student: studentId, 
+            subject: subjectId,
             grade,
             date: date || new Date()
         });
 
-        await newGrade.save(); // Зберігаємо оцінку в базі даних
+        await newGrade.save(); 
 
-        // Додаємо оцінку до списку оцінок студента
         student.grades.push(newGrade._id);
         await student.save();
 
