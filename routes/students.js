@@ -13,7 +13,7 @@ const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Реєстрація
-router.post('/register', async (req, res) => {
+/*router.post('/register', async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -27,7 +27,7 @@ router.post('/register', async (req, res) => {
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
-});
+});*/
 
 // Вхід
 router.post('/login', async (req, res) => {
@@ -134,6 +134,5 @@ router.get('/grades/export', authMiddleware, async (req, res) => {
         res.status(500).json({ error: 'Помилка генерації файлу' });
     }
 });
-
 
 module.exports = router;

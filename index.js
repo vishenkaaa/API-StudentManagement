@@ -11,17 +11,14 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Підключення роутів
 app.use('/students', require('./routes/students'));
 app.use('/subjects', require('./routes/subjects'));
 app.use('/schedule', require('./routes/schedule'));
 app.use('/teachers', require('./routes/teachers'));
 app.use('/grades', require('./routes/grades'));
 
-// Підключення до MongoDB
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,

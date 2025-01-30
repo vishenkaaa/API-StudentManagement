@@ -548,7 +548,7 @@
     "Schedule": {
       "type": "object",
       "properties": {
-        "dayOfWeek": { "type": "string" },
+        "dayOfWeek": { "type": "number" },
         "time": { "type": "string" },
         "subjectId": { "type": "string" }
       }
@@ -556,7 +556,7 @@
     "ScheduleUpdate": {
       "type": "object",
       "properties": {
-        "dayOfWeek": { "type": "string" },
+        "dayOfWeek": { "type": "number" },
         "time": { "type": "string" },
         "subjectId": { "type": "string" }
       }
