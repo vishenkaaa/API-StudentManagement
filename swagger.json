@@ -68,7 +68,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "ID студента для оновлення"
           },
           {
             "name": "body",
@@ -79,6 +80,7 @@
         ],
         "responses": {
           "200": { "description": "Дані успішно оновлено" },
+          "400": { "description": "Некоректні дані" },
           "404": { "description": "Студента не знайдено" }
         }
       }
@@ -480,8 +482,13 @@
       "type": "object",
       "properties": {
         "email": { "type": "string" },
-        "password": { "type": "string" }
-      }
+        "password": { "type": "string" },
+        "surname": { "type": "string" },
+        "name": { "type": "string" },
+        "dateOfBirth": { "type": "string", "format": "date" },
+        "studentClass": { "type": "string" }
+      },
+      "required": ["email", "password", "surname", "name", "dateOfBirth", "studentClass"]
     },
     "Login": {
       "type": "object",

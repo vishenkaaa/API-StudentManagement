@@ -6,13 +6,32 @@ const Student = require('../models/Student');
 const { authMiddleware } = require('../middleware/auth');
 
 const { Document, Packer, Paragraph, TextRun } = require('docx');
-const fs = require('fs');
 const path = require('path');
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Реєстрація
+router.post('/register', async (req, res) => {
+    try {
+        const { email, password, surname, name, dateOfBirth, studentClass } = req.body;
+
+        if (!email || !password || !surname || !name || !dateOfBirth || !studentClass) {
+            return res.status(400).json({ error: 'Будь ласка, заповніть всі поля' });
+        }
+
+        const existingStudent = await Student.findOne({ email });
+        if (existingStudent) return res.status(400).json({ error: 'Email вже зареєстровано' });
+
+        const newStudent = new Student({ email, password, surname, name, dateOfBirth, class: studentClass });
+        await newStudent.save();
+
+        res.status(201).json({ message: 'Студент успішно зареєстрований', studentId: newStudent._id });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
 /*router.post('/register', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -48,12 +67,17 @@ router.post('/login', async (req, res) => {
 });
 
 // Оновлення даних
-router.put('/update/:id', async (req, res) => {
+router.put('/update/:id', authMiddleware, async (req, res) => {
     try {
-        const { surname, name, dateOfBirth, class: studentClass } = req.body;
+        const { id } = req.params;
+        const { surname, name, dateOfBirth, studentClass } = req.body;
+
+        if (!surname || !name || !dateOfBirth || !studentClass) {
+            return res.status(400).json({ error: 'Будь ласка, заповніть всі поля' });
+        }
 
         const updatedStudent = await Student.findByIdAndUpdate(
-            req.params.id,
+            id,
             { surname, name, dateOfBirth, class: studentClass },
             { new: true }
         );
