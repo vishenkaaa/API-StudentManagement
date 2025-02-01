@@ -10,10 +10,6 @@ router.post('/add', async (req, res) => {
     try {
         const { studentId, name, teacherId, hoursPerWeek } = req.body;
 
-        if (!studentId || !name || !teacherId || !hoursPerWeek) {
-            return res.status(400).json({ error: 'Всі поля обов’язкові' });
-        }
-
         const newSubject = new Subject({ name, teacher: teacherId, hoursPerWeek });
         await newSubject.save();
 

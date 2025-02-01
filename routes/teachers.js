@@ -6,12 +6,11 @@ const { authMiddleware } = require('../middleware/auth');
 const router = express.Router();
 
 // Додати вчителя до студента
-router.post('/add', authMiddleware, async (req, res) => {
+router.post('/add', async (req, res) => {
     try {
-        const { surname, name } = req.body;
-        const studentId = req.userId; 
+        const { studentId, surname, name, fatherName } = req.body;
 
-        const newTeacher = new Teacher({ surname, name });
+        const newTeacher = new Teacher({ surname, name, fatherName });
         await newTeacher.save();
 
         const student = await Student.findById(studentId);
@@ -27,10 +26,9 @@ router.post('/add', authMiddleware, async (req, res) => {
 });
 
 // Видалити вчителя у студента
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
-        const teacherId = req.params.id;
-        const studentId = req.userId; 
+        const { teacherId, studentId } = req.params;
 
         const student = await Student.findById(studentId);
         if (!student || !student.teachers.includes(teacherId)) {
@@ -50,20 +48,14 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 });
 
 // Оновити вчителя
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const teacherId = req.params.id;
-        const { surname, name } = req.body;
-        const studentId = req.userId;
-
-        const student = await Student.findById(studentId);
-        if (!student || !student.teachers.includes(teacherId)) {
-            return res.status(403).json({ error: 'Немає доступу до цього вчителя' });
-        }
+        const { surname, name, fatherName } = req.body;
 
         const updatedTeacher = await Teacher.findByIdAndUpdate(
             teacherId,
-            { surname, name },
+            { surname, name, fatherName },
             { new: true }
         );
 
@@ -77,7 +69,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
 
 // Отримати вчителя за ID
-router.get('/:id', authMiddleware, async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const teacherId = req.params.id;
 
@@ -90,10 +82,24 @@ router.get('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-// Отримати список вчителів студента
+// Отримати список вчителів авторизованого студента
 router.get('/', authMiddleware, async (req, res) => {
     try {
         const studentId = req.userId;
+
+        const student = await Student.findById(studentId).populate('teachers');
+        if (!student) return res.status(404).json({ error: 'Cтудента не знайдено' });
+
+        res.json(student.teachers);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Отримати список вчителів конкретного студента
+router.get('/student/:studentId', async (req, res) => {
+    try {
+        const { studentId } = req.params;
 
         const student = await Student.findById(studentId).populate('teachers');
         if (!student) return res.status(404).json({ error: 'Cтудента не знайдено' });

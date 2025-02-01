@@ -156,7 +156,8 @@
             "in": "path",
             "required": true,
             "type": "string"
-          }
+          },
+          { "name": "studentId", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "Вчителя видалено" },
@@ -204,8 +205,22 @@
     "/teachers": {
       "get": {
         "tags": ["Teachers"],
-        "summary": "Отримати список вчителів студента",
+        "summary": "Отримати список вчителів авторизованого студента",
         "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Список вчителів" },
+          "404": { "description": "Студента не знайдено" }
+        }
+      }
+    },
+    "/teachers/student/{studentId}": {
+      "get": {
+        "tags": ["Teachers"],
+        "summary": "Отримати список вчителів конкретного студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "studentId", "in": "path", "required": true, "type": "string" }
+        ],
         "responses": {
           "200": { "description": "Список вчителів" },
           "404": { "description": "Студента не знайдено" }
@@ -532,15 +547,18 @@
     "Teacher": {
       "type": "object",
       "properties": {
+        "studentId": { "type": "string" },
         "surname": { "type": "string" },
-        "name": { "type": "string" }
+        "name": { "type": "string" },
+        "fatherName": {"type": "string"}
       }
     },
     "TeacherUpdate": {
       "type": "object",
       "properties": {
         "surname": { "type": "string" },
-        "name": { "type": "string" }
+        "name": { "type": "string" },
+        "fatherName": {"type": "string"}
       }
     },
     "Subject": {
