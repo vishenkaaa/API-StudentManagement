@@ -67,7 +67,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Оновлення даних
-router.put('/update/:id', authMiddleware, async (req, res) => {
+router.put('/update/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { surname, name, dateOfBirth, studentClass } = req.body;

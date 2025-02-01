@@ -227,7 +227,8 @@
         ],
         "responses": {
           "201": { "description": "Предмет додано" },
-          "400": { "description": "Помилка додавання предмета" }
+          "400": { "description": "Помилка додавання предмета" },
+          "404": { "description": "Студента не знайдено" }
         }
       }
     },
@@ -237,12 +238,8 @@
         "summary": "Видалити предмет у студента",
         "security": [{ "BearerAuth": [] }],
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+          { "name": "subjectId", "in": "path", "required": true, "type": "string" },
+          { "name": "studentId", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "Предмет видалено" },
@@ -290,11 +287,25 @@
     "/subjects": {
       "get": {
         "tags": ["Subjects"],
-        "summary": "Отримати список предметів студента",
+        "summary": "Отримати список предметів авторизованого студента",
         "security": [{ "BearerAuth": [] }],
         "responses": {
           "200": { "description": "Список предметів" },
           "404": { "description": "Учня не знайдено" }
+        }
+      }
+    },
+    "/subjects/student/{studentId}": {
+      "get": {
+        "tags": ["Subjects"],
+        "summary": "Отримати список предметів конкретного студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "studentId", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "Список предметів" },
+          "404": { "description": "Студента не знайдено" }
         }
       }
     },
@@ -523,6 +534,7 @@
     "Subject": {
       "type": "object",
       "properties": {
+        "studentId": { "type": "string" },
         "name": { "type": "string" },
         "teacherId": { "type": "string" },
         "hoursPerWeek": { "type": "number" }
