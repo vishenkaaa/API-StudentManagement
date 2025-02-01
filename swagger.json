@@ -486,7 +486,8 @@
             "in": "path",
             "required": true,
             "type": "string"
-          }
+          },
+          { "name": "studentId", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "Заняття видалено" },
@@ -511,6 +512,45 @@
         "responses": {
           "201": { "description": "Заняття додано" },
           "400": { "description": "Помилка додавання заняття" }
+        }
+      }
+    },
+    "/config": {
+      "get": {
+        "tags": ["Config"],
+        "summary": "Отримати конфігурацію розкладу",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Конфігурація отримана успішно",
+            "schema": { "$ref": "#/definitions/Config" }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Config"],
+        "summary": "Оновити конфігурацію розкладу",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/ConfigUpdate" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Конфігурація успішно оновлена",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string", "example": "Конфігурацію оновлено" },
+                "config": { "$ref": "#/definitions/Config" }
+              }
+            }
+          },
+          "500": { "description": "Помилка оновлення конфігурації" }
         }
       }
     }
@@ -598,17 +638,36 @@
     "Schedule": {
       "type": "object",
       "properties": {
+        "studentId": { "type": "string" },
+        "subjectId": { "type": "string" },
         "dayOfWeek": { "type": "number" },
-        "time": { "type": "string" },
-        "subjectId": { "type": "string" }
+        "lessonNumber": { "type": "number" }
       }
     },
     "ScheduleUpdate": {
       "type": "object",
       "properties": {
         "dayOfWeek": { "type": "number" },
-        "time": { "type": "string" },
+        "lessonNumber": { "type": "number" },
         "subjectId": { "type": "string" }
+      }
+    },
+    "Config": {
+      "type": "object",
+      "properties": {
+        "lessonStartTime": { "type": "string", "example": "08:00" },
+        "bigBreakAfter": { "type": "integer", "example": 4 },
+        "smallBreakDuration": { "type": "integer", "example": 10 },
+        "bigBreakDuration": { "type": "integer", "example": 30 }
+      }
+    },
+    "ConfigUpdate": {
+      "type": "object",
+      "properties": {
+        "lessonStartTime": { "type": "string", "example": "08:30" },
+        "bigBreakAfter": { "type": "integer", "example": 3 },
+        "smallBreakDuration": { "type": "integer", "example": 15 },
+        "bigBreakDuration": { "type": "integer", "example": 25 }
       }
     }
   }

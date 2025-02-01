@@ -18,6 +18,7 @@ app.use('/subjects', require('./routes/subjects'));
 app.use('/schedule', require('./routes/schedule'));
 app.use('/teachers', require('./routes/teachers'));
 app.use('/grades', require('./routes/grades'));
+app.use('/config', require('./routes/config'));
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,

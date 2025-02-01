@@ -7,10 +7,9 @@ const { authMiddleware } = require('../middleware/auth');
 const router = express.Router();
 
 // Додати заняття до розкладу студента
-router.post('/add', authMiddleware, async (req, res) => {
+router.post('/add', async (req, res) => {
     try {
-        const { dayOfWeek, time, subjectId } = req.body;
-        const studentId = req.userId; 
+        const { studentId, dayOfWeek, lessonNumber, subjectId } = req.body;
 
         const student = await Student.findById(studentId);
         if (!student) return res.status(404).json({ error: 'Студента не знайдено' });
@@ -18,7 +17,7 @@ router.post('/add', authMiddleware, async (req, res) => {
         const subject = await Subject.findById(subjectId);
         if (!subject) return res.status(404).json({ error: 'Предмет не знайдено' });
 
-        const newSchedule = new Schedule({ dayOfWeek, time, subject });
+        const newSchedule = new Schedule({ dayOfWeek, lessonNumber, subject });
         await newSchedule.save();
 
         student.schedule.push(newSchedule._id);
@@ -31,7 +30,7 @@ router.post('/add', authMiddleware, async (req, res) => {
 });
 
 // Оновити заняття в розкладі студента
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const scheduleId = req.params.id;
         const { dayOfWeek, time, subject } = req.body;
@@ -57,7 +56,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // Видалити заняття з розкладу студента
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const scheduleId = req.params.id;
         const studentId = req.userId;
@@ -79,7 +78,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-// Отримати розклад студента
+// Отримати розклад авторизованого студента
 router.get('/', authMiddleware, async (req, res) => {
     try {
         const studentId = req.userId;
@@ -97,7 +96,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // Отримати конкретне заняття з розкладу студента
-router.get('/:id', authMiddleware, async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const scheduleId = req.params.id;
         const studentId = req.userId;
