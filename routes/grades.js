@@ -6,10 +6,9 @@ const { authMiddleware } = require('../middleware/auth');
 const router = express.Router();
 
 // Додати оцінку
-router.post('/add', authMiddleware, async (req, res) => {
+router.post('/add', async (req, res) => {
     try {
-        const { subjectId, grade, date } = req.body;
-        const studentId = req.userId;
+        const { studentId, subjectId, grade, date } = req.body;
 
         const student = await Student.findById(studentId);
         if (!student) return res.status(404).json({ error: 'Студента не знайдено' });
@@ -26,17 +25,16 @@ router.post('/add', authMiddleware, async (req, res) => {
         student.grades.push(newGrade._id);
         await student.save();
 
-        res.status(201).json({ message: 'Оцінку додано.', grade: newGrade });
+        res.status(201).json({ message: 'Оцінку додано', grade: newGrade });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 });
 
 // Видалити оцінку
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
-        const gradeId = req.params.id;
-        const studentId = req.userId;
+        const {gradeId, studentId} = req.params;
 
         const student = await Student.findById(studentId);
         if (!student || !student.grades.includes(gradeId)) {
@@ -54,16 +52,10 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 });
 
 // Оновити оцінку
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const gradeId = req.params.id;
         const { grade, date } = req.body;
-        const studentId = req.userId;
-
-        const student = await Student.findById(studentId);
-        if (!student || !student.grades.includes(gradeId)) {
-            return res.status(403).json({ error: 'Немає доступу до цієї оцінки' });
-        }
 
         const updatedGrade = await Grade.findByIdAndUpdate(
             gradeId,
@@ -80,7 +72,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // Отримати оцінку за ID
-router.get('/:id', authMiddleware, async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const gradeId = req.params.id;
 
@@ -93,10 +85,24 @@ router.get('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-// Отримати список оцінок студента
+// Отримати список оцінок авторизованого студента
 router.get('/', authMiddleware, async (req, res) => {
     try {
         const studentId = req.userId;
+
+        const student = await Student.findById(studentId).populate('grades');
+        if (!student) return res.status(404).json({ error: 'Cтудента не знайдено' });
+
+        res.json(student.grades);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Отримати список оцінок студента за його id
+router.get('/student/:studentId', async (req, res) => {
+    try {
+        const { studentId } = req.params;
 
         const student = await Student.findById(studentId).populate('grades');
         if (!student) return res.status(404).json({ error: 'Cтудента не знайдено' });

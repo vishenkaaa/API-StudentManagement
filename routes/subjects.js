@@ -34,7 +34,7 @@ router.post('/add', async (req, res) => {
 // Видалити предмет
 router.delete('/:id', async (req, res) => {
     try {
-       const { subjectId, studentId } = req.params;
+        const { subjectId, studentId } = req.params;
 
         const student = await Student.findById(studentId);
         if (!student || !student.subjects.includes(subjectId)) {

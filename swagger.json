@@ -335,11 +335,9 @@
         "security": [{ "BearerAuth": [] }],
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+            "name": "id", "in": "path", "required": true, "type": "string"
+          },
+          { "name": "studentId", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "Оцінку видалено" },
@@ -387,8 +385,22 @@
     "/grades": {
       "get": {
         "tags": ["Grades"],
-        "summary": "Отримати список оцінок студента",
+        "summary": "Отримати список оцінок авторизованого студента",
         "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Список оцінок" },
+          "404": { "description": "Учня не знайдено" }
+        }
+      }
+    },
+    "/grades/student/{studentId}": {
+      "get": {
+        "tags": ["Grades"],
+        "summary": "Отримати список оцінок конкретного студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "studentId", "in": "path", "required": true, "type": "string" }
+        ],
         "responses": {
           "200": { "description": "Список оцінок" },
           "404": { "description": "Учня не знайдено" }
@@ -551,6 +563,7 @@
     "Grade": {
       "type": "object",
       "properties": {
+        "studentId": { "type": "string" },
         "subjectId": { "type": "string" },
         "grade": { "type": "number" },
         "date": { "type": "string", "format": "date" }
