@@ -34,12 +34,6 @@ router.put('/:id', async (req, res) => {
     try {
         const scheduleId = req.params.id;
         const { dayOfWeek, time, subject } = req.body;
-        const studentId = req.userId;
-
-        const student = await Student.findById(studentId);
-        if (!student || !student.schedule.includes(scheduleId)) {
-            return res.status(403).json({ error: 'Немає доступу до цього заняття' });
-        }
 
         const updatedSchedule = await Schedule.findByIdAndUpdate(
             scheduleId,
@@ -58,8 +52,7 @@ router.put('/:id', async (req, res) => {
 // Видалити заняття з розкладу студента
 router.delete('/:id', async (req, res) => {
     try {
-        const scheduleId = req.params.id;
-        const studentId = req.userId;
+        const {scheduleId, studentId} = req.params;
 
         const student = await Student.findById(studentId);
         if (!student || !student.schedule.includes(scheduleId)) {
@@ -86,6 +79,26 @@ router.get('/', authMiddleware, async (req, res) => {
         const student = await Student.findById(studentId).populate({
             path: 'schedule',
             populate: [{ path: 'subject' }, { path: 'teacher' }]
+        });
+        if (!student) return res.status(404).json({ error: 'Студента не знайдено' });
+
+        res.json(student.schedule);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Отримати розклад конкретного студента
+router.get('/student/:studentId', async (req, res) => {
+    try {
+        const { studentId } = req.params;
+
+        const student = await Student.findById(studentId).populate({
+            path: 'schedule',
+            populate: {
+                path: 'subject',
+                populate: { path: 'teacher' } // Виправлено: тепер `teacher` буде всередині `subject`
+            }
         });
         if (!student) return res.status(404).json({ error: 'Студента не знайдено' });
 

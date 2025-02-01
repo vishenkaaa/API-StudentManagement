@@ -425,7 +425,21 @@
     "/schedule": {
       "get": {
         "tags": ["Schedule"],
-        "summary": "Отримати розклад студента",
+        "summary": "Отримати розклад авторизованого студента",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Розклад студента" },
+          "404": { "description": "Студента не знайдено" }
+        }
+      }
+    },
+    "/schedule/student/{studentId}": {
+      "get": {
+        "tags": ["Schedule"],
+        "summary": "Отримати розклад конкретного студента",
+        "parameters": [
+          { "name": "studentId", "in": "path", "required": true, "type": "string" }
+        ],
         "security": [{ "BearerAuth": [] }],
         "responses": {
           "200": { "description": "Розклад студента" },
