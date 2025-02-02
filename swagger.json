@@ -126,6 +126,27 @@
         }
       }
     },
+    "/students/{id}": {
+      "delete": {
+        "tags": ["Students"],
+        "summary": "Видалити студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID студента, якого потрібно видалити"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Студента  успішно видалено" },
+          "404": { "description": "Студента не знайдено" },
+          "500": { "description": "Помилка сервера" }
+        }
+      }
+    },
     "/teachers/add": {
       "post": {
         "tags": ["Teachers"],

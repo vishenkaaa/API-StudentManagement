@@ -8,8 +8,7 @@ const StudentSchema = new mongoose.Schema({
     name: { type: String },
     dateOfBirth: { type: Date },
     class: { type: String },
-    grades: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Grade' }],
-    teachers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Teacher' }], 
+    grades: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Grade' }], 
     subjects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Subject' }], 
     schedule: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Schedule' }] 
 });

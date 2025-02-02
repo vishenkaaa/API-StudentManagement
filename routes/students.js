@@ -90,6 +90,30 @@ router.put('/update/:id', async (req, res) => {
     }
 });
 
+// Видалення студента
+router.delete('/:id', async (req, res) => {
+    try {
+        const studentId = req.params.id;
+
+        const student = await Student.findById(studentId);
+        if (!student) {
+            return res.status(404).json({ error: 'Студента не знайдено' });
+        }
+
+        await Grade.deleteMany({ _id: { $in: student.grades } });
+
+        await Subject.deleteMany({ _id: { $in: student.subjects } });
+
+        await Schedule.deleteMany({ _id: { $in: student.schedule } });
+
+        await Student.findByIdAndDelete(studentId);
+
+        res.json({ message: 'Студента успішно видалено' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Пошук учнів за класом
 router.get('/class/:class', async (req, res) => {
     try {
