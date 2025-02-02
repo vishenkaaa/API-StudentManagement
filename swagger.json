@@ -157,7 +157,7 @@
             "required": true,
             "type": "string"
           },
-          { "name": "studentId", "in": "path", "required": true, "type": "string" }
+          { "name": "studentId", "in": "query", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "Вчителя видалено" },
@@ -254,7 +254,7 @@
         "security": [{ "BearerAuth": [] }],
         "parameters": [
           { "name": "subjectId", "in": "path", "required": true, "type": "string" },
-          { "name": "studentId", "in": "path", "required": true, "type": "string" }
+          { "name": "studentId", "in": "query", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "Предмет видалено" },
@@ -352,7 +352,7 @@
           {
             "name": "id", "in": "path", "required": true, "type": "string"
           },
-          { "name": "studentId", "in": "path", "required": true, "type": "string" }
+          { "name": "studentId", "in": "query", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "Оцінку видалено" },
@@ -501,7 +501,7 @@
             "required": true,
             "type": "string"
           },
-          { "name": "studentId", "in": "path", "required": true, "type": "string" }
+          { "name": "studentId", "in": "query", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "Заняття видалено" },

@@ -34,7 +34,8 @@ router.post('/add', async (req, res) => {
 // Видалити оцінку
 router.delete('/:id', async (req, res) => {
     try {
-        const {gradeId, studentId} = req.params;
+        const gradeId = req.params.id;
+        const studentId = req.query.studentId; 
 
         const student = await Student.findById(studentId);
         if (!student || !student.grades.includes(gradeId)) {

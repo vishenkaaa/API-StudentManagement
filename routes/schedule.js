@@ -52,7 +52,8 @@ router.put('/:id', async (req, res) => {
 // Видалити заняття з розкладу студента
 router.delete('/:id', async (req, res) => {
     try {
-        const {scheduleId, studentId} = req.params;
+        const scheduleId = req.params.id;
+        const studentId = req.query.studentId; 
 
         const student = await Student.findById(studentId);
         if (!student || !student.schedule.includes(scheduleId)) {

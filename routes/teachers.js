@@ -1,6 +1,7 @@
 const express = require('express');
 const Teacher = require('../models/Teacher');
 const Student = require('../models/Student');
+const Subject = require('../models/Subject');
 const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
@@ -28,12 +29,15 @@ router.post('/add', async (req, res) => {
 // Видалити вчителя у студента
 router.delete('/:id', async (req, res) => {
     try {
-        const { teacherId, studentId } = req.params;
+        const teacherId = req.params.id;
+        const studentId = req.query.studentId; 
 
         const student = await Student.findById(studentId);
         if (!student || !student.teachers.includes(teacherId)) {
             return res.status(403).json({ error: 'Немає доступу до цього вчителя' });
         }
+
+        await Subject.updateMany({ teacher: teacherId }, { $unset: { teacher: "" } });
 
         const deletedTeacher = await Teacher.findByIdAndDelete(teacherId);
         if (!deletedTeacher) return res.status(404).json({ error: 'Вчителя не знайдено' });
