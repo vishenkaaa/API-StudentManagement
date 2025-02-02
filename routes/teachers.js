@@ -9,16 +9,10 @@ const router = express.Router();
 // Додати вчителя до студента
 router.post('/add', async (req, res) => {
     try {
-        const { studentId, surname, name, fatherName } = req.body;
+        const { surname, name, fatherName } = req.body;
 
         const newTeacher = new Teacher({ surname, name, fatherName });
         await newTeacher.save();
-
-        const student = await Student.findById(studentId);
-        if (student) {
-            student.teachers.push(newTeacher._id);
-            await student.save();
-        }
 
         res.status(201).json({ message: 'Вчителя додано', teacher: newTeacher });
     } catch (error) {
@@ -30,20 +24,11 @@ router.post('/add', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const teacherId = req.params.id;
-        const studentId = req.query.studentId; 
-
-        const student = await Student.findById(studentId);
-        if (!student || !student.teachers.includes(teacherId)) {
-            return res.status(403).json({ error: 'Немає доступу до цього вчителя' });
-        }
-
+        
         await Subject.updateMany({ teacher: teacherId }, { $unset: { teacher: "" } });
 
         const deletedTeacher = await Teacher.findByIdAndDelete(teacherId);
         if (!deletedTeacher) return res.status(404).json({ error: 'Вчителя не знайдено' });
-
-        student.teachers = student.teachers.filter((id) => id.toString() !== teacherId);
-        await student.save();
 
         res.json({ message: 'Вчителя видалено' });
     } catch (error) {
@@ -86,29 +71,11 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Отримати список вчителів авторизованого студента
-router.get('/', authMiddleware, async (req, res) => {
+// Отримати список усіх вчителів
+router.get('/', async (req, res) => {
     try {
-        const studentId = req.userId;
-
-        const student = await Student.findById(studentId).populate('teachers');
-        if (!student) return res.status(404).json({ error: 'Cтудента не знайдено' });
-
-        res.json(student.teachers);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Отримати список вчителів конкретного студента
-router.get('/student/:studentId', async (req, res) => {
-    try {
-        const { studentId } = req.params;
-
-        const student = await Student.findById(studentId).populate('teachers');
-        if (!student) return res.status(404).json({ error: 'Cтудента не знайдено' });
-
-        res.json(student.teachers);
+        const teachers = await Teacher.find();
+        res.json(teachers);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

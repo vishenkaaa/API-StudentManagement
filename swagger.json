@@ -129,7 +129,7 @@
     "/teachers/add": {
       "post": {
         "tags": ["Teachers"],
-        "summary": "Додати вчителя до студента",
+        "summary": "Додати вчителя",
         "security": [{ "BearerAuth": [] }],
         "parameters": [
           {
@@ -148,7 +148,7 @@
     "/teachers/{id}": {
       "delete": {
         "tags": ["Teachers"],
-        "summary": "Видалити вчителя у студента",
+        "summary": "Видалити вчителя",
         "security": [{ "BearerAuth": [] }],
         "parameters": [
           {
@@ -156,12 +156,10 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          { "name": "studentId", "in": "query", "required": true, "type": "string" }
+          }
         ],
         "responses": {
           "200": { "description": "Вчителя видалено" },
-          "403": { "description": "Немає доступу до цього вчителя" },
           "404": { "description": "Вчителя не знайдено" }
         }
       },
@@ -184,7 +182,7 @@
       },
       "put": {
         "tags": ["Teachers"],
-        "summary": "Оновити вчителя",
+        "summary": "Оновити дані вчителя",
         "security": [{ "BearerAuth": [] }],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" },
@@ -196,8 +194,7 @@
           }
         ],
         "responses": {
-          "200": { "description": "Вчителя оновлено" },
-          "403": { "description": "Немає доступу до цього вчителя" },
+          "200": { "description": "Дані вчителя оновлено" },
           "404": { "description": "Вчителя не знайдено" }
         }
       }
@@ -205,25 +202,10 @@
     "/teachers": {
       "get": {
         "tags": ["Teachers"],
-        "summary": "Отримати список вчителів авторизованого студента",
+        "summary": "Отримати список усіх вчителів",
         "security": [{ "BearerAuth": [] }],
         "responses": {
-          "200": { "description": "Список вчителів" },
-          "404": { "description": "Студента не знайдено" }
-        }
-      }
-    },
-    "/teachers/student/{studentId}": {
-      "get": {
-        "tags": ["Teachers"],
-        "summary": "Отримати список вчителів конкретного студента",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [
-          { "name": "studentId", "in": "path", "required": true, "type": "string" }
-        ],
-        "responses": {
-          "200": { "description": "Список вчителів" },
-          "404": { "description": "Студента не знайдено" }
+          "200": { "description": "Список вчителів" }
         }
       }
     },
@@ -601,7 +583,6 @@
     "Teacher": {
       "type": "object",
       "properties": {
-        "studentId": { "type": "string" },
         "surname": { "type": "string" },
         "name": { "type": "string" },
         "fatherName": {"type": "string"}
