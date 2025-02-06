@@ -59,6 +59,26 @@
         }
       }
     },
+    "/students": {
+      "get": {
+        "tags": ["Students"],
+        "summary": "Отримати список всіх студентів",
+        "description": "Повертає список усіх зареєстрованих студентів.",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Успішний запит. Повертається список студентів.",
+            "schema": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/Student" }
+            }
+          },
+          "500": {
+            "description": "Помилка сервера."
+          }
+        }
+      }
+    },
     "/students/update/{id}": {
       "put": {
         "tags": ["Students"],
@@ -590,6 +610,33 @@
       "properties": {
         "email": { "type": "string" },
         "password": { "type": "string" }
+      }
+    },
+    "Student": {
+      "type": "object",
+      "properties": {
+        "_id": { "type": "string" },
+        "email": { "type": "string" },
+        "surname": { "type": "string" },
+        "name": { "type": "string" },
+        "dateOfBirth": { "type": "string", "format": "date" },
+        "class": { "type": "string" },
+        "subjects": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "teachers": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "grades": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "schedule": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
       }
     },
     "StudentUpdate": {

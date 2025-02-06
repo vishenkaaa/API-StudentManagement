@@ -32,22 +32,6 @@ router.post('/register', async (req, res) => {
     }
 });
 
-/*router.post('/register', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        const existingStudent = await Student.findOne({ email });
-        if (existingStudent) return res.status(400).json({ error: 'Email вже зареєстровано' });
-
-        const newStudent = new Student({ email, password });
-        await newStudent.save();
-
-        res.status(201).json({ message: 'Студент успішно зареєстрований', studentId: newStudent._id });
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});*/
-
 // Вхід
 router.post('/login', async (req, res) => {
     try {
@@ -109,6 +93,16 @@ router.delete('/:id', async (req, res) => {
         await Student.findByIdAndDelete(studentId);
 
         res.json({ message: 'Студента успішно видалено' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Отримати список всіх студентів
+router.get('/', async (req, res) => {
+    try {
+        const students = await Student.find(); 
+        res.json(students); 
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
