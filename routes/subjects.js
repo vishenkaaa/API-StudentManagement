@@ -1,7 +1,10 @@
 const express = require('express');
 const Subject = require('../models/Subject');
+const Schedule = require('../models/Schedule');
 const Student = require('../models/Student');
+const Teacher = require('../models/Teacher');
 const { authMiddleware } = require('../middleware/auth');
+const mongoose = require('mongoose');
 
 const router = express.Router();
 
@@ -31,22 +34,32 @@ router.post('/add', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const subjectId = req.params.id;
-        const studentId = req.query.studentId; 
+        const studentId = req.query.studentId;
 
         const student = await Student.findById(studentId);
         if (!student || !student.subjects.includes(subjectId)) {
             return res.status(403).json({ error: 'Немає доступу до цього предмета' });
         }
 
-        await Subject.findByIdAndDelete(subjectId);
-        student.subjects = student.subjects.filter((id) => id.toString() !== subjectId);
-        await student.save();
+        const schedulesToDelete = await Schedule.find({ subject: subjectId });
+        const scheduleIdsToDelete = schedulesToDelete.map(schedule => schedule._id.toString());
 
-        res.json({ message: 'Предмет видалено' });
+        await Schedule.deleteMany({ subject: subjectId });
+
+        student.subjects = student.subjects.filter(id => id.toString() !== subjectId);
+
+        // Видалити ID видалених записів розкладу з `student.schedule`
+        student.schedule = student.schedule.filter(id => !scheduleIdsToDelete.includes(id.toString()));
+
+        await student.save();
+        await Subject.findByIdAndDelete(subjectId);
+
+        res.json({ message: 'Предмет та відповідні записи з розкладу видалено' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // Оновити предмет
 router.put('/:id', async (req, res) => {
@@ -106,6 +119,40 @@ router.get('/student/:studentId', async (req, res) => {
 
         res.json(student.subjects);
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Отримати список предметів вчителя за його ID (тільки ті, що вивчає авторизований студент)
+router.get('/teacher/:teacherId', authMiddleware, async (req, res) => {
+    try {
+        const { teacherId } = req.params;
+        const studentId = req.userId; 
+        
+        if (!mongoose.Types.ObjectId.isValid(teacherId)) {
+            return res.status(400).json({ error: 'Неправильний формат ID вчителя' });
+        }
+        
+        const teacher = await Teacher.findById(teacherId);
+        if (!teacher) {
+            return res.status(404).json({ error: 'Вчителя не знайдено' });
+        }
+        
+        const student = await Student.findById(studentId).populate('subjects');
+        if (!student) {
+            return res.status(404).json({ error: 'Студента не знайдено' });
+        }
+        
+        const studentSubjectIds = student.subjects.map(subject => subject._id.toString());
+        
+        const teacherSubjects = await Subject.find({ 
+            teacher: teacherId,
+            _id: { $in: studentSubjectIds }
+        });
+        
+        res.json(teacherSubjects);
+    } catch (error) {
+        console.error('Помилка отримання предметів вчителя:', error);
         res.status(500).json({ error: error.message });
     }
 });

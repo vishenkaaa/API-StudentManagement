@@ -79,7 +79,7 @@
         }
       }
     },
-    "/students/update/{id}": {
+    "/students/{id}": {
       "put": {
         "tags": ["Students"],
         "summary": "Оновлення даних студента",
@@ -102,6 +102,25 @@
           "200": { "description": "Дані успішно оновлено" },
           "400": { "description": "Некоректні дані" },
           "404": { "description": "Студента не знайдено" }
+        }
+      },
+      "delete": {
+        "tags": ["Students"],
+        "summary": "Видалити студента",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID студента, якого потрібно видалити"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Студента  успішно видалено" },
+          "404": { "description": "Студента не знайдено" },
+          "500": { "description": "Помилка сервера" }
         }
       }
     },
@@ -143,27 +162,6 @@
           },
           "404": { "description": "Студента не знайдено" },
           "500": { "description": "Помилка генерації файлу" }
-        }
-      }
-    },
-    "/students/{id}": {
-      "delete": {
-        "tags": ["Students"],
-        "summary": "Видалити студента",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "ID студента, якого потрібно видалити"
-          }
-        ],
-        "responses": {
-          "200": { "description": "Студента  успішно видалено" },
-          "404": { "description": "Студента не знайдено" },
-          "500": { "description": "Помилка сервера" }
         }
       }
     },
@@ -247,6 +245,24 @@
         "security": [{ "BearerAuth": [] }],
         "responses": {
           "200": { "description": "Список вчителів" }
+        }
+      }
+    },
+    "/teachers/student": {
+      "get": {
+        "tags": ["Teachers"],
+        "summary": "Отримати список вчителів авторизованого учня",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Список вчителів",
+            "schema": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/Teacher" }
+            }
+          },
+          "404": { "description": "Студента не знайдено" },
+          "500": { "description": "Помилка сервера" }
         }
       }
     },

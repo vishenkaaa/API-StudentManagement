@@ -98,7 +98,7 @@ router.get('/student/:studentId', async (req, res) => {
             path: 'schedule',
             populate: {
                 path: 'subject',
-                populate: { path: 'teacher' } // Виправлено: тепер `teacher` буде всередині `subject`
+                populate: { path: 'teacher' } 
             }
         });
         if (!student) return res.status(404).json({ error: 'Студента не знайдено' });

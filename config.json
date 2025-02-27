@@ -1,6 +1,6 @@
 {
-    "lessonStartTime": "08:30",
+    "lessonStartTime": "08:00",
     "bigBreakAfter": 3,
-    "smallBreakDuration": 10,
-    "bigBreakDuration": 20
+    "bigBreakDuration": 20,
+    "smallBreakDuration": 10
 }

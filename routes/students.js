@@ -3,6 +3,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const Student = require('../models/Student');
+const Subject = require('../models/Subject');  
+const Grade = require('../models/Grade');    
+const Schedule = require('../models/Schedule');
+
 const { authMiddleware } = require('../middleware/auth');
 
 const { Document, Packer, Paragraph, TextRun } = require('docx');
@@ -51,18 +55,18 @@ router.post('/login', async (req, res) => {
 });
 
 // Оновлення даних
-router.put('/update/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { surname, name, dateOfBirth, studentClass } = req.body;
+        const { email, surname, name, dateOfBirth, studentClass } = req.body;
 
-        if (!surname || !name || !dateOfBirth || !studentClass) {
+        if (!email || !surname || !name || !dateOfBirth || !studentClass) {
             return res.status(400).json({ error: 'Будь ласка, заповніть всі поля' });
         }
 
         const updatedStudent = await Student.findByIdAndUpdate(
             id,
-            { surname, name, dateOfBirth, class: studentClass },
+            { email: email, surname, name, dateOfBirth, class: studentClass },
             { new: true }
         );
 
@@ -74,6 +78,20 @@ router.put('/update/:id', async (req, res) => {
     }
 });
 
+// Отримати учня за ID
+router.get('/:id', async (req, res) => {
+    try {
+        const studentId = req.params.id;
+
+        const student = await Student.findById(studentId);
+        if (!student) return res.status(404).json({ error: 'Учня не знайдено' });
+
+        res.json(student);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Видалення студента
 router.delete('/:id', async (req, res) => {
     try {
@@ -81,24 +99,33 @@ router.delete('/:id', async (req, res) => {
 
         const student = await Student.findById(studentId);
         if (!student) {
+            console.log("Студента не знайдено");
             return res.status(404).json({ error: 'Студента не знайдено' });
         }
 
-        await Grade.deleteMany({ _id: { $in: student.grades } });
+        if (student.subjects && student.subjects.length > 0) {
+            await Subject.deleteMany({ _id: { $in: student.subjects } });
+        }
 
-        await Subject.deleteMany({ _id: { $in: student.subjects } });
+        if (student.grades && student.grades.length > 0) {
+            await Grade.deleteMany({ _id: { $in: student.grades } });
+        }
 
-        await Schedule.deleteMany({ _id: { $in: student.schedule } });
+        if (student.schedule && student.schedule.length > 0) {
+            await Schedule.deleteMany({ _id: { $in: student.schedule } });
+        }
 
         await Student.findByIdAndDelete(studentId);
 
+        console.log("Студента успішно видалено");
         res.json({ message: 'Студента успішно видалено' });
     } catch (error) {
+        console.error("Помилка видалення:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Отримати список всіх студентів
+// Отримати список всіх учнів
 router.get('/', async (req, res) => {
     try {
         const students = await Student.find(); 
